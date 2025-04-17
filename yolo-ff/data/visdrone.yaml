@@ -1,0 +1,7 @@
+train: D:/yolov9-main/datasets/visdrone/train_list.txt
+val: D:/yolov9-main/datasets/visdrone/val_list.txt
+test: D:/yolov9-main/datasets/visdrone/test_list.txt
+
+nc: 12
+
+names: ['pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor', 'ignore', 'others']
