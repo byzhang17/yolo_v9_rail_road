@@ -9,6 +9,7 @@ import threading
 import json
 import shutil
 from merge_result import merge_result
+from utils.find_HF import find_HF_in_images
 
 app = Flask(__name__)
 
@@ -62,30 +63,52 @@ def process_post_request():
                 save_path_rule = detect_rule(source_path=group1_dir, save_path=rpath + '/rule_result')
                 
             def run_rule_2():
-                nonlocal save_path_rule
-                save_path_rule = detect_rule(source_path=group2_dir, save_path=rpath + '/rule_result_2')    
+                nonlocal save_path_rule_2
+                save_path_rule_2 = detect_rule(source_path=group2_dir, save_path=rpath + '/rule_result_2')   
+                
+            def run_HF():
+                nonlocal save_path_HF
+                save_path_HF = find_HF_in_images(source_path=group1_dir, save_path=rpath + '/HF_result')
+                
+            def run_HF_2():
+                nonlocal save_path_HF_2
+                save_path_HF_2 = find_HF_in_images(source_path=group2_dir, save_path=rpath + '/HF_result_2')
 
             save_path_model = None
             save_path_rule = None
+            save_path_rule_2 = None
             save_path_model_2 = None
+            save_path_HF = None
+            save_path_HF_2 = None
+            
 
             # 创建线程来运行模型和规则检测
             model_thread = threading.Thread(target=run_model)
             model_thread_2 = threading.Thread(target=run_model_2)
             model_thread_rule = threading.Thread(target=run_rule)
             model_thread_rule_2 = threading.Thread(target=run_rule_2)
+            HF_thread = threading.Thread(target=run_HF)
+            HF_thread_2 = threading.Thread(target=run_HF_2)
+            
             
             # 启动所有线程
             model_thread.start()
             model_thread_2.start()
             model_thread_rule.start()
             model_thread_rule_2.start()
+            HF_thread.start()
+            HF_thread_2.start()
             
             # 等待所有线程完成
             model_thread.join()
             model_thread_2.join()
             model_thread_rule.join()
             model_thread_rule_2.join()
+            HF_thread.join()
+            HF_thread_2.join()
+            
+            
+            
             
             end_time = time.time()
             

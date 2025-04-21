@@ -6,6 +6,7 @@ import os
 import cv2
 def merge_result(rpath, saveDir):
     datas_rule = []
+    datas_HF = []
 
     save_path1=rpath + '/rule_result'
 
@@ -14,6 +15,36 @@ def merge_result(rpath, saveDir):
     savedir_model1=rpath + '/model_result'
 
     savedir_model2=rpath + '/model_result_2'
+    
+    savedir_HF = rpath + '/HF_result'
+    
+    savedir_HF_2 = rpath + '/HF_result_2'
+    
+    # 读取save_path1中所有json文件，将结果存储到datas中
+    for file_name in os.listdir(savedir_HF):
+        if file_name.endswith('.json'):
+            file_path = os.path.join(savedir_HF, file_name)
+            with open(file_path, 'r', encoding='utf-8') as json_file:
+                try:
+                    data = json.load(json_file)
+                    datas_HF += data
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON from file {file_path}: {e}")
+                    
+    # 读取save_path2中所有json文件，将结果存储到datas中
+    for file_name in os.listdir(savedir_HF_2):
+        if file_name.endswith('.json'):
+            file_path = os.path.join(savedir_HF_2, file_name)
+            with open(file_path, 'r', encoding='utf-8') as json_file:
+                try:
+                    data = json.load(json_file)
+                    datas_HF += data
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON from file {file_path}: {e}")
+                    
+    for data in datas_HF:
+        data["url"] = data["url"].replace("group1/", "").replace("group2/", "").replace("group1\\", "").replace("group2\\", "")
+    
 
     # 读取save_path1中所有json文件，将结果存储到datas中
     for file_name in os.listdir(save_path1):
@@ -80,6 +111,14 @@ def merge_result(rpath, saveDir):
             merged_data[url] = {'url': url, 'damage': item['damage']}
         else:            
             merged_data[url]['damage'].extend(item['damage'])
+            
+    for item in datas_HF:
+        url = item['url']
+        if url not in merged_data:
+            merged_data[url] = {'url': url, 'damage': item['damage']}
+        else:            
+            merged_data[url]['damage'].extend(item['damage'])        
+            
         
     # 合并 datas_rule
     for item in datas_rule:
