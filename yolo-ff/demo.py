@@ -68,11 +68,11 @@ def process_post_request():
                 
             def run_HF():
                 nonlocal save_path_HF
-                save_path_HF = find_HF_in_images(source_path=group1_dir, save_path=rpath + '/HF_result')
+                save_path_HF = find_HF_in_images(image_folder=group1_dir, save_path=rpath + '/HF_result')
                 
             def run_HF_2():
                 nonlocal save_path_HF_2
-                save_path_HF_2 = find_HF_in_images(source_path=group2_dir, save_path=rpath + '/HF_result_2')
+                save_path_HF_2 = find_HF_in_images(image_folder=group2_dir, save_path=rpath + '/HF_result_2')
 
             save_path_model = None
             save_path_rule = None

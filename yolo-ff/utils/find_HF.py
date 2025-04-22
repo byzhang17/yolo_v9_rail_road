@@ -5,6 +5,7 @@ import pytesseract
 from pytesseract import Output
 import time
 import json
+import os
 
 def find_HF(im0):
     """
@@ -40,12 +41,17 @@ def process_image(image_path):
         return 0  # Return 0 if the image cannot be read
     
     result_HF = find_HF(im)
+    #result_HF = []
     #print('time_HF:', end_time - start_time)
     data = {"url" : image_path, "damage": result_HF}
     return data # Return processing time for the image
 
-def  find_HF_in_image(image_folder, save_path):
+def find_HF_in_images(image_folder, save_path):
     # Read all images in the current folder and process them
+    
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
+        print(f"Created directory: {save_path}")
 
     image_files = [f for f in os.listdir(image_folder) if f.endswith(('.png', '.jpg', '.jpeg', '.bmp'))]
     image_paths = [os.path.join(image_folder, f) for f in image_files]
