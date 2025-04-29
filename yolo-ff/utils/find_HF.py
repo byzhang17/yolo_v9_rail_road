@@ -28,9 +28,8 @@ def find_HF(im0):
             
             (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
             #data[d['text'][i]] = ([d['left'][i], d['top'][i], d['width'][i], d['height'][i]])
-            result.append([int(x), int(y), int(w), int(h), 14, 0.5])
+            result.append([int(x), int(y + height//7*6), int(w), int(h), 14, 0.5])
             #cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 1)
- 
     #cv2.imshow("recoText", im)
     return result
 
