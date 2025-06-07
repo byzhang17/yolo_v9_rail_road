@@ -151,33 +151,56 @@ def find_xiantiao(img0):
 
     fld = cv2.ximgproc.createFastLineDetector()
     
-    img_hs = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
+    #img_hs = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
 
-    mask = (img0 >= [230, 230, 230]).all(axis=2)
+    mask = (img0 >= [230,230,230]).all(axis = 2)
     img0[mask] = [0, 0, 0]
+
+    img_hs = img0
     
     kernel = np.ones((5, 5), np.uint8)
     img0 = cv2.dilate(img0, kernel, iterations=1)
     img = cv2.cvtColor(img0, cv2.COLOR_BGR2GRAY)
 
     dlines = fld.detect(img)
-    dlines_2 = fld.detect(img_hs)
+    #dlines_2 = fld.detect(img_hs)
     lines2 = []
     lines2_2 = []
-    if isinstance(dlines_2, np.ndarray):
-        for dline in dlines_2:
-            x0, y0, x1, y1 = map(int, dline[0])
-            length = np.hypot(x1 - x0, y1 - y0)
 
-            if 1 < length < 100:
-                k = (y1 - y0) / (x1 - x0) if x1 - x0 != 0 else float('inf')
-                if abs(k) < 0.6:
-                    continue
+    # if isinstance(dlines_2, np.ndarray):
+    #     for dline in dlines_2:
+    #         x0, y0, x1, y1 = map(int, dline[0])
+    #         length = np.hypot(x1 - x0, y1 - y0)
 
-                if y0 > y1:
-                    x0, y0, x1, y1 = x1, y1, x0, y0
+    #         if 1 < length < 100:
+    #             k = (y1 - y0) / (x1 - x0) if x1 - x0 != 0 else float('inf')
+    #             if abs(k) < 0.6:
+    #                 continue
 
-                lines2_2.append([x0, y0, x1, y1])
+    #             if y0 > y1:
+    #                 x0, y0, x1, y1 = x1, y1, x0, y0
+
+    #             lines2_2.append([x0, y0, x1, y1])
+    
+
+    ret,thresh = cv2.threshold(cv2.cvtColor(img_hs ,cv2.COLOR_BGR2GRAY),0,255,0)
+    contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)#得到轮廓信息
+    result = []
+    for i in contours:
+        # 外接正矩形
+        x, y, w, h = cv2.boundingRect(i)
+
+        lines2_2.append([x, y, x + w, y + h])
+        #cv2.rectangle(img_hs, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+
+    
+    #print("检测到的线条:", lines2_2)
+            
+    #print("检测到的线条数量:", len(lines2_2))
+
+
+
     
 
     if isinstance(dlines, np.ndarray):

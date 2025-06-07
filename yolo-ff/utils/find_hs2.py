@@ -84,7 +84,8 @@ def find_hs2(im, res_line, res_lines):
     ]
     lines_hs2 = [
         line for line in lines_hs2
-        if np.hypot(line[2] - line[0], line[3] - line[1]) > 12
+        #if np.hypot(line[2] - line[0], line[3] - line[1]) > 13 and np.hypot(line[2] - line[0], line[3] - line[1]) < 40
+        if line[3] - line[1] > 13 and line[3] - line[1] < 40
     ]
     lines_hs2.sort()
 
@@ -101,14 +102,13 @@ def find_hs2(im, res_line, res_lines):
                     np.hypot(line[2] - line[0], line[3] - line[1])
                     for line in lines
                 ])
-                avg_x0 = np.mean([line[0] for line in lines])
-                avg_y0 = np.mean([line[1] for line in lines])
+                #avg_x0 = np.mean([line[0] for line in lines])
+                #avg_y0 = np.mean([line[1] for line in lines])
 
-                if len(lines) in {1, 2, 3}:
-                    result.append([
-                        avg_x0 - length, avg_y0 - length,
-                        avg_x0 + length, avg_y0 + length
-                    ])
+                if len(lines) in {1}:
+                    result.append(
+                        lines[0]
+                    )
 
                 lines.clear()
                 pre = i + 1

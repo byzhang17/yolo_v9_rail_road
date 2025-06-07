@@ -25,6 +25,7 @@ from utils.is_buquan import *
 import json
 import time
 from threading import Thread
+from utils import config
 
 @smart_inference_mode()
 def run(
@@ -91,6 +92,8 @@ def run(
     model.warmup(imgsz=(1 if pt or model.triton else bs, 3, *imgsz))  # warmup
     seen, windows, dt = 0, [], (Profile(), Profile(), Profile())
     for path, im, im0s, vid_cap, s in dataset:
+        if config.shared_data["stop"] == True:
+            return
         with dt[0]:
             im = torch.from_numpy(im).to(model.device)
             im = im.half() if model.fp16 else im.float()  # uint8 to fp16/32
@@ -337,7 +340,7 @@ class DetectAPI:
                         cls = int(cls)
 
                         if cls == 5:
-                            if w > 0.5 or conf < 0.28:
+                            if w > 0.5 :
                                 continue
                             txts.append([x1, y1, w, h, cls, conf])
                             if len(res) < 2:
@@ -360,6 +363,8 @@ class DetectAPI:
                             crop = imc[:, x1:x2]
                             tag = is_buquan(crop, res)
                             txts.append([x1, y1, w, h, 39 if tag else cls, conf])
+                        elif cls == 14:
+                            continue
                         else:
                             txts.append([x1, y1, w, h, cls, conf])
                         

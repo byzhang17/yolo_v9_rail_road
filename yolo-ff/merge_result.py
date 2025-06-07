@@ -3,6 +3,7 @@ import requests
 import json
 
 import os
+import pdb
 import cv2
 def merge_result(rpath, saveDir):
     datas_rule = []
@@ -99,8 +100,50 @@ def merge_result(rpath, saveDir):
     # 删除url路径中的group1和group2
     for data in datas_model:
         data["url"] = data["url"].replace("group1/", "").replace("group2/", "").replace("group1\\", "").replace("group2\\", "")
-                        
 
+    
+    
+
+
+    #核伤过滤
+    for i in range(0, len(datas_model)):
+        damage = datas_model[i]["damage"]
+        url = datas_model[i]["url"]
+        label0 = []
+        for j in range(0, len(damage)):
+            if (damage[j][4] == 5):
+                label0.append(damage[j])
+
+        if len(label0) != 0:
+            im0  = cv2.imread(datas_model[i]["url"])
+            im = im0.copy()
+            mask = (im >= [230,230,230]).all(axis=2) | (im == [52,255,191]).all(axis=2)
+            im[mask]  = [0,0,0]
+
+            for m in range(0, len(label0)):
+                x1, y1, w, h, label, score = label0[m]
+                x2 = int(x1 + w)
+                y2 = int(y1 + h)
+                img = im[y1:y2, x1:x2]#裁剪出损伤区域
+
+                ret,thresh = cv2.threshold(cv2.cvtColor(img,cv2.COLOR_BGR2GRAY),0,255,0)
+                contours,hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)#得到轮廓信息
+                result = []
+                for i in contours:
+                    # 外接正矩形
+                    x, y, w, h = cv2.boundingRect(i)
+                    x = x + x1
+                    y = y + y1
+                    result.append(y)
+   
+                if len(result) == 0:
+                    height = 0
+                else:
+                    height = min(result)
+
+                if (label0[m][4] == 5 and height > 70):
+                    damage.remove(label0[m])
+            
     # 合并url相同的
     merged_data = {}
 
@@ -230,10 +273,28 @@ def merge_result(rpath, saveDir):
     # 删除datas中damage值为空的项
     datas = [item for item in datas if item["damage"]]
 
+
+
+    #save_path = '/home/zhangbenyi/yolo_save'
+    # if not os.path.exists(saveDir):
+    #     os.makedirs(saveDir)
+    
+    # for i, data in enumerate(datas):
+    #     save_path_img = os.path.join(saveDir, f"result_{i}.jpg")
+    #     im0 = cv2.imread(data["url"])
+    #     if im0 is not None:
+    #         for damage in data["damage"]:
+    #             x1, y1, w, h, _, _ = damage
+    #             x2 = int(x1 + w)
+    #             y2 = int(y1 + h)
+    #             cv2.rectangle(im0, (x1, y1), (x2, y2), (0, 255, 0), 2)
+    #         cv2.imwrite(save_path_img, im0)
+
+
     if os.path.isdir(saveDir):
         wpath = saveDir + '/result.json'
         f = open(wpath, 'w')
         f.write(json.dumps(datas))
         return wpath
-
+    
 

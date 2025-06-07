@@ -12,6 +12,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 import json
 import time
+from utils import config
 
 #轨底裂纹处理
 def guidi(txts2, imc, res, lines):
@@ -101,6 +102,7 @@ def zero(txts2, imc, res, lines):
 
 def detect_image(imc_name,res):
     txts2 = []
+
     imc = cv2.imread(imc_name)
     lines,lines_2 = find_xiantiao(imc.copy())
     # Define threads for each detection function
@@ -152,6 +154,8 @@ def detect_rule(source_path, save_path):
     
     with ThreadPoolExecutor(max_workers=4) as executor:
         for result in executor.map(process_image, image_paths):
+            if config.shared_data["stop"] == True:
+                return
             results.append(result)
     
     #print(results)
@@ -166,7 +170,7 @@ def detect_rule(source_path, save_path):
 
 if __name__ == "__main__":
     source_path = '/home/zhangbenyi/yolov9'
-    save_path = '/home/zhangbenyi/yolov9/detect'
+    save_path = '/home/zhangbenyi/yolo_save'
     time_start = time.time()
     detect_rule(source_path, save_path)
     time_end = time.time()

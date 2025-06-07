@@ -24,3 +24,5 @@ for data in datas:
         width = str(w1 / w)
         height = str(h1 / h)
         f.write(str(label) + ' ' + x + ' ' + y + ' ' + width + ' ' + height + '\n')
+
+        

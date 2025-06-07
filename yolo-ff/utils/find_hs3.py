@@ -116,7 +116,7 @@ def find_hs3(im, res_line, res_lines):
 
                 length1 = lines[len(lines) - 1][0] - lines[0][0]
 
-                if ((len(lines) <= 8) and any([l > 15 for l in lens]) and length1 < 30):
+                if ((len(lines) <= 8) and any([l > 15 and l < 40 for l in lens]) and length1 < 30):
                     result.append([avg_x0 - length, avg_y0 - length, avg_x0 + length, avg_y0 + length])
 
                 lines.clear()
@@ -136,6 +136,8 @@ def find_hs3(im, res_line, res_lines):
 
                 avg_x0 = np.mean([line[0] for line in lines])
                 avg_y0 = np.mean([line[1] for line in lines])
+                avg_x1 = np.mean([line[2] for line in lines])
+                avg_y1 = np.mean([line[3] for line in lines])
 
                 length = length / len(lines)
 
@@ -143,8 +145,8 @@ def find_hs3(im, res_line, res_lines):
                 
                 #print(length1, len(lines), length, lens)
 
-                if ((len(lines) <= 8) and any([l > 15 for l in lens]) and length1 < 30):
-                    result.append([avg_x0 - length, avg_y0 - length, avg_x0 + length, avg_y0 + length])
+                if ((len(lines) <= 2) and any([l > 15 for l in lens]) and length1 < 30):
+                    result.append([avg_x0, avg_y0, avg_x1, avg_y1])
 
                 lines.clear()
                 pre = i + 1

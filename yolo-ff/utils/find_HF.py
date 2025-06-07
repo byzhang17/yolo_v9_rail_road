@@ -6,6 +6,7 @@ from pytesseract import Output
 import time
 import json
 import os
+import config
 
 def find_HF(im0):
     """
@@ -30,6 +31,9 @@ def find_HF(im0):
             #data[d['text'][i]] = ([d['left'][i], d['top'][i], d['width'][i], d['height'][i]])
             result.append([int(x), int(y + height//7*6), int(w), int(h), 14, 0.5])
             #cv2.rectangle(im, (x, y), (x + w, y + h), (255, 0, 0), 1)
+        if 0 < len(d['text'][i]) and (d['text'][i] == 'ZS' or d['text'][i] == 'Zs' or d['text'][i] == 'zs' or d['text'][i] == 'zS'): 
+            (x, y, w, h) = (d['left'][i], d['top'][i], d['width'][i], d['height'][i])
+            result.append([int(x), int(y + height//7*6), int(w), int(h), 19, 0.5])
     #cv2.imshow("recoText", im)
     return result
 
@@ -59,6 +63,8 @@ def find_HF_in_images(image_folder, save_path):
 
     with ThreadPoolExecutor() as executor:
         for result in executor.map(process_image, image_paths):
+            if config.shared_data["stop"] == True:
+                return
             result_HF.append(result)
 
     result_path = os.path.join(save_path, 'results_HF.json')
