@@ -6,7 +6,7 @@ from pytesseract import Output
 import time
 import json
 import os
-import config
+import utils.config as config
 
 def find_HF(im0):
     """
@@ -64,7 +64,7 @@ def find_HF_in_images(image_folder, save_path):
     with ThreadPoolExecutor() as executor:
         for result in executor.map(process_image, image_paths):
             if config.shared_data["stop"] == True:
-                return
+                break
             result_HF.append(result)
 
     result_path = os.path.join(save_path, 'results_HF.json')

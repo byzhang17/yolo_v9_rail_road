@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 yolov9 = DetectAPI(device = '0')
 
-yolov9_2 = DetectAPI(device = '1')
+yolov9_2 = DetectAPI(device = '0')
 
 
 @app.route('/stop_processing', methods=['POST'])
@@ -24,7 +24,7 @@ def stop_processing():
 
     # 设置停止标志
     config.shared_data["stop"] = True
-    
+
     return jsonify({"status": "Stop request sent"})
 
 
@@ -33,7 +33,6 @@ def process_post_request():
     print(request.form)
     config.shared_data["stop"] = False
     # 重置停止标志
-    stop_flag = False
     if 'rpath' and 'wpath' in request.form:
         rpath = request.form['rpath']
         wpath = request.form['wpath']
@@ -44,9 +43,9 @@ def process_post_request():
             
             # 获取rpath中的图片文件列表
             image_files = [f for f in os.listdir(rpath) if os.path.isfile(os.path.join(rpath, f)) and f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-            # 检查是否已请求停止
-            if config.shared_data["stop"] == True:
-                return jsonify({"error": "Processing stopped by user request"}), 400
+            # # 检查是否已请求停止
+            # if config.shared_data["stop"] == True:
+            #     return jsonify({"error": "Processing stopped by user request"}), 400
             
             # 将图片文件均分为两组
             mid_index = len(image_files) // 2
@@ -111,8 +110,8 @@ def process_post_request():
             model_thread_2.start()
             model_thread_rule.start()
             model_thread_rule_2.start()
-            HF_thread.start()
-            HF_thread_2.start()
+            #HF_thread.start()
+            #HF_thread_2.start()
             
             # 等待所有线程完成
             model_thread.join()
@@ -122,12 +121,9 @@ def process_post_request():
             HF_thread.join()
             HF_thread_2.join()
             
-            # 检查是否已请求停止
-            if config.shared_data["stop"] == True:
-                return jsonify({"error": "Processing stopped by user request"}), 400    
-            
-            
-            
+            # # 检查是否已请求停止
+            # if config.shared_data["stop"] == True:
+            #     return jsonify({"error": "Processing stopped by user request"}), 400    
             end_time = time.time()
             
             save_path = merge_result(rpath,wpath)

@@ -155,7 +155,7 @@ def detect_rule(source_path, save_path):
     with ThreadPoolExecutor(max_workers=4) as executor:
         for result in executor.map(process_image, image_paths):
             if config.shared_data["stop"] == True:
-                return
+                break
             results.append(result)
     
     #print(results)
