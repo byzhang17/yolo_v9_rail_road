@@ -110,8 +110,8 @@ def process_post_request():
             model_thread_2.start()
             model_thread_rule.start()
             model_thread_rule_2.start()
-            #HF_thread.start()
-            #HF_thread_2.start()
+            HF_thread.start()
+            HF_thread_2.start()
             
             # 等待所有线程完成
             model_thread.join()
