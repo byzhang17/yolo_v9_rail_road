@@ -11,6 +11,8 @@ import shutil
 from merge_result import merge_result
 from utils.find_HF import find_HF_in_images
 from utils import config
+from utils.get_res import get_earliest_image, get_guize
+import cv2
 
 app = Flask(__name__)
 
@@ -52,6 +54,13 @@ def process_post_request():
             group1 = image_files[:mid_index]
             group2 = image_files[mid_index:]
             
+            
+            res = []
+            first_img = get_earliest_image(rpath)
+            if first_img is not None:
+                img = cv2.imread(first_img)
+                res = get_guize(img)
+            
             # 创建两个子目录用于存放分组后的图片
             group1_dir = os.path.join(rpath, 'group1')
             group2_dir = os.path.join(rpath, 'group2')
@@ -74,11 +83,11 @@ def process_post_request():
  
             def run_rule():
                 nonlocal save_path_rule
-                save_path_rule = detect_rule(source_path=group1_dir, save_path=rpath + '/rule_result')
+                save_path_rule = detect_rule(source_path=group1_dir, save_path=rpath + '/rule_result',res =res)
                 
             def run_rule_2():
                 nonlocal save_path_rule_2
-                save_path_rule_2 = detect_rule(source_path=group2_dir, save_path=rpath + '/rule_result_2')   
+                save_path_rule_2 = detect_rule(source_path=group2_dir, save_path=rpath + '/rule_result_2',res = res)   
                 
             def run_HF():
                 nonlocal save_path_HF
@@ -110,16 +119,16 @@ def process_post_request():
             model_thread_2.start()
             model_thread_rule.start()
             model_thread_rule_2.start()
-            HF_thread.start()
-            HF_thread_2.start()
+            #HF_thread.start()
+            #HF_thread_2.start()
             
             # 等待所有线程完成
             model_thread.join()
             model_thread_2.join()
             model_thread_rule.join()
             model_thread_rule_2.join()
-            HF_thread.join()
-            HF_thread_2.join()
+            #HF_thread.join()
+            #HF_thread_2.join()
             
             # # 检查是否已请求停止
             # if config.shared_data["stop"] == True:

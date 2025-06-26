@@ -104,8 +104,13 @@ def detect_image(imc_name,res):
     txts2 = []
 
     imc = cv2.imread(imc_name)
-    lines,lines_2 = find_xiantiao(imc.copy())
+    lines, lines_2 = find_xiantiao(imc.copy())
     # Define threads for each detection function
+    
+    print("Processing image:", imc_name)
+    if imc is None:
+        print(f"Error reading image: {imc_name}")
+        return txts2
     threads = [
         threading.Thread(target=boli, args=(txts2, imc, res)),
         threading.Thread(target=hs2, args=(txts2, imc, res, lines_2)),
@@ -128,12 +133,9 @@ def detect_image(imc_name,res):
     return txts2
          
 
-def detect_rule(source_path, save_path):
-    res = []
-    first_img = get_earliest_image(source_path)
-    if first_img is not None:
-        img = cv2.imread(first_img)
-        res = get_guize(img)
+def detect_rule(source_path, save_path, res):
+
+    print("Detection rules:", res)
     
     if not os.path.exists(save_path):
         os.makedirs(save_path)
@@ -144,9 +146,11 @@ def detect_rule(source_path, save_path):
     def process_image(image_path):
         txts2 = detect_image(image_path, res)
         
+        print(f"Processed {image_path}, found {len(txts2)} damages.")
+        
         #image_name = os.path.splitext(os.path.basename(image_path))[0]
         #result_path = os.path.join(save_path, image_name + '.json')
-        data = {'url': os.path.join(save_path,image_path), 'damage': txts2}
+        data = {'url': os.path.join(save_path, image_path), 'damage': txts2}
         # with open(result_path, 'w') as f:
         #     json.dump(data, f)
         return data
